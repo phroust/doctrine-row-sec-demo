@@ -66,7 +66,7 @@ class RepositoryTest extends KernelTestCase
      *
      * @return void
      */
-    public function testEmptyResultForDefaultTenant(): void
+    public function testApplicationUserCannotSeeUnrelatedTenants(): void
     {
         $this->forceTenantId(-1);
 
@@ -75,7 +75,22 @@ class RepositoryTest extends KernelTestCase
 
 
         self::assertEmpty($repo->count([]));
+    }
 
+    /**
+     * This tests that the database will not return users if no matching ID was set
+     *
+     * @return void
+     */
+    public function testApplicationUserCannotSeeUnrelatedUsers(): void
+    {
+        $this->forceTenantId(-1);
+
+        $repo = $this->entityManager
+            ->getRepository(TenantUser::class);
+
+
+        self::assertEmpty($repo->count([]));
     }
 
     /**
