@@ -12,8 +12,14 @@ class TenantParameterAwareDriver extends AbstractDriverMiddleware
     {
         $conn = parent::connect($params);
 
-        if ($params['user'] == 'application') {
-            $conn->exec("SET app.current_tenant TO DEFAULT;");
+        # make sure the parameter is always present.
+        # this allows queries to succeed and return an empty result instead of throwing an error
+        $conn->exec('SET app.current_tenant TO DEFAULT;');
+
+        # todo: override the ID from whatever source there might be
+        # example:
+        if (($tenantID = (int)getenv('TENANT_ID'))) {
+            $conn->exec(sprintf('SET app.current_tenant TO %d;', $tenantID));
         }
 
         return $conn;
